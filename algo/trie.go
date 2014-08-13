@@ -1,11 +1,6 @@
 package algo
 
 import fmt "fmt"
-//import bytes "bytes"
-import log "log"
-import os "os"
-import bufio "bufio"
-import strings "strings"
 import errors "errors"
 
 type Word  rune
@@ -106,52 +101,16 @@ func splitStringToRunes(s string) *Token {
 	return &token
 }
 
-func LoadDictToTrie(filepath string) *Trie {
+func New(word_chan chan string) *Trie {
 	var tree Trie
-	file, err := os.Open(filepath)
-	if err != nil {
-		log.Fatal("open file failed: ", filepath)
-	}
-	bufReader := bufio.NewReader(file)
-	for {
-		line, err := bufReader.ReadString('\n')
-		if err != nil {
-			break
-		}
-		
-		if line[0] == '#' {
-			continue
-		}
-		line = strings.Trim(line, "\n")
-		arr := strings.Split(line, " ")
-		if tree.numTokens > 100000 {
-			break
-		}
-		tree.AddToken(splitStringToRunes(arr[1]))
+	for word := range word_chan {
+		tree.AddToken(splitStringToRunes(word))
 	}
 	return &tree
 }
 
-func test() {
-	/*
-	var tree Trie
-	const hanyu = "汉语文字"
-	const hanyu2 = "汉字文学"
-	tree.AddToken(splitStringToRunes(hanyu))
-	tree.AddToken(splitStringToRunes(hanyu2))
-	*/
-	var dict_filepath = "/Users/xumaoxing/Downloads/cedict_ts.u8"
-	tree := LoadDictToTrie(dict_filepath)
-	//tree.Print()
-	
-	fmt.Println(tree.Search(splitStringToRunes("21kr")))
-	n, _ := tree.Search(splitStringToRunes("USB"))
-	n.Print("")
-	n2, _ := n.Search(splitStringToRunes("记忆"))
-	n2.Print("")
-	
-	//n3, _ := n.Search(splitStringToRunes("haha")); n3.Print("")
-	
-	//var n = node{Word('从'), true, nil}
-	//log.Println(n.String())
+func (t *Trie) Update(word_chan chan string) {
+	for word := range word_chan {
+		t.AddToken(splitStringToRunes(word))
+	}
 }

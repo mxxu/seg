@@ -6,9 +6,14 @@ import (
 )
 
 func TestSeg(t *testing.T) {
-	var dict_filepath = "./cedict_ts.u8"
-	tree := LoadDictToTrie(dict_filepath)
-	//tree.Print()
+	fd := FileDict {
+		filepath: "./dict.txt",
+		linenum: 0,
+		maxLine: -1,
+		processor: &SogouInput_Processor{},
+	}
+	tree := New(fd.LoadDict())
+	
 	Segment("我们在野生动物园玩", tree)
 	Segment("P民K歌", tree)
 	Segment("中华人民共和国", tree)
@@ -19,6 +24,13 @@ func TestSeg(t *testing.T) {
 		"共同创造美好的新世纪",
 		"我不喜欢日本和服",
 		"工信处女干事每月经过下属科室都要亲口交代24口交换机等技术性器件的安装工作",
+		"结婚的和尚未结婚的",
+		"梁启超生前住在这里",
+		"费孝通向人大常委会提交书面报告",
+		"粮食不卖给八路军",
+		"阿拉斯加遭强暴风雪袭击致xx人死亡",
+		"把手抬起来",
+		"他说的确实在理",
 	}
 	for _, test := range tests {
 		Segment(test, tree)
