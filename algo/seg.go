@@ -10,6 +10,24 @@ type SegFlag struct {
 	head   int
 }
 
+type SegResult struct {
+	tokens []Token
+}
+
+func NewSegResult(n int) *SegResult {
+	return &SegResult{
+		tokens: make([]Token, n),
+	}
+}
+
+func (sr *SegResult) Print() {
+	for _, t := range sr.tokens {
+		t.Print("")
+		fmt.Print(", ")
+	}
+	fmt.Print("\n")
+}
+
 func minInt(a, b int) int {
 	if (a < b) {
 		return a
@@ -22,6 +40,7 @@ func Segment(s string, tree *Trie) []string {
 	// 先将string类型拆分成单字
 	// go对unicode类型支持的很好，range就能自动搞定
 	var words = splitStringToRunes(s)
+	log.Println("words len is ", len(*words))
 	// 初始化辅助数据结构segflags
 	var segflags = make([]SegFlag, len(*words))
 	for i := range segflags {
@@ -32,13 +51,13 @@ func Segment(s string, tree *Trie) []string {
 	for i, _ := range *words {
 		var nd  = &(tree.root)
 		for j := i; j < minInt(len(*words), tree.maxTokenLen+i); j++ {
-			n, err := nd.SearchWord(&(*words)[j])
+			n, err := nd.SearchWord((*words)[j])
 			if (err != nil) {
-				//log.Printf("search word %c from %c failed", (*words)[j], nd.word)
+				log.Printf("search word %c from %c failed", (*words)[j], nd.word)
 				break
 			}
 			if (n.isEnd) {
-				//log.Printf("token is end: %c, i=%d, j=%d", (*words)[i:j+1], i, j)
+				log.Printf("token is end: %c, i=%d, j=%d", (*words)[i:j+1], i, j)
 				if (segflags[j].head < 0) {
 					segflags[j].head = i
 				}
@@ -56,7 +75,6 @@ func Segment(s string, tree *Trie) []string {
 			nd = n
 		}
 		// 分词词典中找不到，单字成词
-		// TODO：多位的数字需要组合成一个词，比如“32场演唱会”
 		if (segflags[i].head < 0) {
 			segflags[i].head = i
 		}
@@ -65,12 +83,15 @@ func Segment(s string, tree *Trie) []string {
 	for i := len(segflags)-1; i >= 0; i = segflags[i].head - 1 {
 		numSegs++
 	}
-	var ret = make([]string, numSegs)
+	//var ret = make([]string, numSegs)
+	var ret = NewSegResult(numSegs)
 	var j = numSegs-1
 	for i := len(segflags)-1; i >= 0; i = segflags[i].head - 1 {
-		ret[j] = fmt.Sprintf("%c", (*words)[segflags[i].head:i+1])
+		//ret.tokens[j] = fmt.Sprintf("%c", (*words)[segflags[i].head:i+1])
+		ret.tokens[j] = (*words)[segflags[i].head:i+1]
 		j--
 	}
-	log.Print(ret)
+	//log.Print(ret)
+	ret.Print()
 	return nil
 }

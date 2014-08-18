@@ -1,8 +1,10 @@
 package algo
 
 import (
-	//"fmt"
+	"fmt"
 	"testing"
+	"unicode"
+	"unicode/utf8"
 )
 
 func TestLoad(t *testing.T) {
@@ -14,4 +16,10 @@ func TestLoad(t *testing.T) {
 	} ()
 	tree := New(word_chan)
 	tree.Print()
+	
+	fmt.Println(splitStringToRunes("我想1你234哈哈"))
+	
+	fmt.Println(unicode.IsLetter(rune('我')))
+	r, size := utf8.DecodeRuneInString("我想")
+	fmt.Println(unicode.IsDigit(r), size)
 }
